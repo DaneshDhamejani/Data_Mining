@@ -19,14 +19,26 @@ app=Flask(__name__)
 @app.route('/api',methods=['POST'])
 
 def api():
-    print("Inside API")
-    text=request.json['text']
+    result = {'Neural Nets':"","Naive Bayes":"","Logistic Regression":""}
+    text=request.json
     print(text)
 
     nlp = en_core_web_sm.load()
 
     model = load_model("model_cv2.h5")
+    model_lr = pickle.load(open("LR_bow.sav","rb"))
+    model_nb = pickle.load(open("MultinomialNB_bow.sav","rb"))
     print("Loaded model@!")
+
+    prediction_lr= model_lr.predict(text)
+    result['Logistic Regression'] = "SINCERE" if (prediction_lr == 0) else "INSINCERE"
+    print(prediction_lr)
+
+    prediction_nb = model_nb.predict(text)
+    result['Naive Bayes'] = "SINCERE" if (prediction_nb == 0) else "INSINCERE"
+    print(prediction_nb)
+
+    text=request.json['text']
 
     # getting vocab_freq, its word2index and  its lemma_dict convertion
     vocab_freq = {}
@@ -56,12 +68,12 @@ def api():
     #pass word_sequences in predict
     X_test_data = keras.preprocessing.sequence.pad_sequences(word_sequences, maxlen=100)
     prediction= model.predict(X_test_data)
-    print(":::::::::::::PREDICTION:"+prediction)
+    print(prediction)
     if(prediction>0.04):
-        return "INSINCERE"
+        result['Neural Nets']="INSINCERE"
     else:
-        return "SINCERE"
+        result['Neural Nets']="SINCERE"
 
-   
+    return result
     
    

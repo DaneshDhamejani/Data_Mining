@@ -8,7 +8,6 @@ from tensorflow.python import keras
 from tensorflow.python.keras.models import load_model
 from flask_cors import CORS
 
-
 #pip install -U pip setuptools wheel
 #pip install -U spacy
 #python -m spacy download en_core_web_sm
@@ -23,26 +22,29 @@ CORS(app)
 @app.route('/api',methods=['POST'])
 
 def api():
-    result = {'Neural Nets':"","Naive Bayes":"","Logistic Regression":""}
+
+    print("Hello")
+    result = {'Neural_Nets':"","Naive_Bayes":"","Logistic_Regression":""}
     text=request.json
-    print(text)
+    text = text['question']
 
     nlp = en_core_web_sm.load()
 
-    model = load_model("/home/danesh/Downloads/model_cv2.h5")
-    model_lr = pickle.load(open("/home/danesh/Downloads/LR_bow.sav","rb"))
-    model_nb = pickle.load(open("/home/danesh/Downloads/MultinomialNB_bow.sav","rb"))
+    model = load_model("model_cv2.h5")
+    model_lr = pickle.load(open("LR_bow.sav","rb"))
+    model_nb = pickle.load(open("MultinomialNB_bow.sav","rb"))
     print("Loaded model@!")
 
-    prediction_lr= model_lr.predict(text)
-    result['Logistic Regression'] = "SINCERE" if (prediction_lr == 0) else "INSINCERE"
+    prediction_lr= model_lr.predict(request.json)
+    result['Logistic_Regression'] = "SINCERE" if (prediction_lr == 0) else "INSINCERE"
     print(prediction_lr)
 
-    prediction_nb = model_nb.predict(text)
-    result['Naive Bayes'] = "SINCERE" if (prediction_nb == 0) else "INSINCERE"
+    prediction_nb = model_nb.predict(request.json)
+    result['Naive_Bayes'] = "SINCERE" if (prediction_nb == 0) else "INSINCERE"
     print(prediction_nb)
 
-    text=request.json['text']
+    
+    print("Got TEXT",text)
 
     # getting vocab_freq, its word2index and  its lemma_dict convertion
     vocab_freq = {}
@@ -66,17 +68,14 @@ def api():
 
     vocab_size = len(word2index)
 
-    # print('Found %s unique tokens.' % len(word2index))
-    # word2index
-
     #pass word_sequences in predict
     X_test_data = keras.preprocessing.sequence.pad_sequences(word_sequences, maxlen=100)
     prediction= model.predict(X_test_data)
     print(prediction)
     if(prediction>0.04):
-        result['Neural Nets']="INSINCERE"
+        result['Neural_Nets']="INSINCERE"
     else:
-        result['Neural Nets']="SINCERE"
+        result['Neural_Nets']="SINCERE"
 
     return result
     

@@ -46,7 +46,7 @@ function Question() {
     } else {
       if (question.includes("?")) {
         axios
-          .post("http://localhost:3000/question", {
+          .post("http://localhost:5000/api", {
             question: question,
           })
           .then((response) => {

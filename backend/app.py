@@ -6,6 +6,8 @@ import numpy as np
 # import tensorflow
 from tensorflow.python import keras
 from tensorflow.python.keras.models import load_model
+from flask_cors import CORS
+
 
 #pip install -U pip setuptools wheel
 #pip install -U spacy
@@ -15,6 +17,8 @@ import spacy
 import en_core_web_sm
 
 app=Flask(__name__)
+CORS(app)
+
 
 @app.route('/api',methods=['POST'])
 
@@ -25,9 +29,9 @@ def api():
 
     nlp = en_core_web_sm.load()
 
-    model = load_model("model_cv2.h5")
-    model_lr = pickle.load(open("LR_bow.sav","rb"))
-    model_nb = pickle.load(open("MultinomialNB_bow.sav","rb"))
+    model = load_model("/home/danesh/Downloads/model_cv2.h5")
+    model_lr = pickle.load(open("/home/danesh/Downloads/LR_bow.sav","rb"))
+    model_nb = pickle.load(open("/home/danesh/Downloads/MultinomialNB_bow.sav","rb"))
     print("Loaded model@!")
 
     prediction_lr= model_lr.predict(text)
